@@ -9,7 +9,14 @@ npm install
 npm run dev
 ```
 
+Data is persisted in a SQLite database (file at `DATABASE_PATH`, default `./data/quicknotes.db`).
+Migrations live in `migrations/` and run automatically on startup (and can be run manually with
+`npm run migrate`).
+
 Listens on `PORT` (default 3000).
+
+Required environment variables (see `.env.example`): `OPENAI_API_KEY`, `STRIPE_WEBHOOK_SECRET`,
+`JWT_SECRET`.
 
 ## Endpoints
 
@@ -21,6 +28,14 @@ Listens on `PORT` (default 3000).
 | DELETE | `/api/notes/:id` | Delete a note |
 | GET | `/api/notes/:id/summary` | One-line AI summary |
 | POST | `/api/webhooks/stripe` | Stripe events (upgrades to Pro) |
+
+## Tests
+
+```bash
+npm test
+```
+
+Runs the Vitest suite, which covers note CRUD and payment-state (Stripe webhook) logic against an isolated, throwaway SQLite database.
 
 ---
 

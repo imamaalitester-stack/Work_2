@@ -1,7 +1,11 @@
 import { Hono } from "hono";
 import { sign } from "hono/jwt";
 
-const SECRET = process.env.JWT_SECRET || "quicknotes-dev-secret";
+const SECRET = process.env.JWT_SECRET;
+
+if (!SECRET) {
+  throw new Error("Missing required environment variable: JWT_SECRET");
+}
 
 const app = new Hono();
 
