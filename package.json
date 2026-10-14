@@ -6,10 +6,18 @@
   "description": "Notes API with AI summaries and paid 'pro' notebooks.",
   "scripts": {
     "dev": "node --watch src/index.js",
-    "start": "node src/index.js"
+    "start": "node src/index.js",
+    "migrate": "node src/migrate.js",
+    "test": "vitest run"
   },
   "dependencies": {
     "@hono/node-server": "^1.13.1",
-    "hono": "^4.6.3"
+    "@sentry/node": "^8.34.0",
+    "better-sqlite3": "^11.3.0",
+    "hono": "^4.6.3",
+    "zod": "^3.23.8"
+  },
+  "devDependencies": {
+    "vitest": "^2.1.3"
   }
 }

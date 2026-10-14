@@ -1,25 +1,34 @@
-const notes = new Map([
-  ["1", { id: "1", owner: "u1", title: "Groceries", body: "eggs, oat milk, (lots of) coffee", pro: false }],
-  ["2", { id: "2", owner: "u1", title: "Pitch deck", body: "Problem, solution, traction, ask", pro: true }],
-  ["3", { id: "3", owner: "u2", title: "Gift ideas", body: "Board game, plant, socks", pro: false }],
-]);
-const accounts = new Map([["u1", { id: "u1", email: "sam@quicknotes.test", plan: "free" }]]);
-let nextId = 4;
+import { openDatabase } from "./migrate.js";
+
+const sqlite = openDatabase();
+
+function rowToNote(row) {
+  if (!row) return null;
+  return { ...row, pro: !!row.pro };
+}
 
 export const db = {
   notes: {
-    list: () => [...notes.values()],
-    get: (id) => notes.get(id) ?? null,
+    list: () => sqlite.prepare("SELECT * FROM notes").all().map(rowToNote),
+    get: (id) => rowToNote(sqlite.prepare("SELECT * FROM notes WHERE id = ?").get(id)),
     insert: (row) => {
-      const id = String(nextId++);
-      const saved = { id, pro: false, ...row };
-      notes.set(id, saved);
-      return saved;
+      const info = sqlite
+        .prepare("INSERT INTO notes (owner, title, body, pro) VALUES (?, ?, ?, ?)")
+        .run(row.owner, row.title, row.body ?? "", row.pro ? 1 : 0);
+      return db.notes.get(info.lastInsertRowid);
     },
-    delete: (id) => notes.delete(id),
+    delete: (id) => sqlite.prepare("DELETE FROM notes WHERE id = ?").run(id).changes > 0,
   },
   accounts: {
-    get: (id) => accounts.get(id) ?? null,
-    update: (id, patch) => accounts.set(id, { ...accounts.get(id), ...patch }),
+    get: (id) => sqlite.prepare("SELECT * FROM accounts WHERE id = ?").get(id) ?? null,
+    update: (id, patch) => {
+      const current = db.accounts.get(id);
+      if (!current) return null;
+      const merged = { ...current, ...patch };
+      sqlite
+        .prepare("UPDATE accounts SET email = ?, plan = ? WHERE id = ?")
+        .run(merged.email, merged.plan, id);
+      return db.accounts.get(id);
+    },
   },
 };
