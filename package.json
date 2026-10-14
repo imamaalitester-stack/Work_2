@@ -1,0 +1,15 @@
+{
+  "name": "quicknotes-api",
+  "version": "0.5.1",
+  "private": true,
+  "type": "module",
+  "description": "Notes API with AI summaries and paid 'pro' notebooks.",
+  "scripts": {
+    "dev": "node --watch src/index.js",
+    "start": "node src/index.js"
+  },
+  "dependencies": {
+    "@hono/node-server": "^1.13.1",
+    "hono": "^4.6.3"
+  }
+}
